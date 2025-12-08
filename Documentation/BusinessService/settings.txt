@@ -1,0 +1,111 @@
+
+Settings in All Business Services
+Provides reference information for settings that are available in most or all business services. You can configure these settings after you have added a business service to your production.
+Summary
+All business services have the following settings:
+
+Group	Settings
+Informational Settings	Comment, Category, Class Name, Description, Adapter Class Name, Adapter Description, Business Partner
+Basic Settings	Enabled
+Additional Settings	Schedule, Pool Size, Throttle Delay, GenerateSuperSessionID
+Alerting Control	Alert Grace Period, Alert On Error, Inactivity Timeout
+Development and Debugging	Foreground, Log Trace Events, Archive IO
+Adapter Class Name
+Common to business services and business operations. The class name for the inbound adapter associated with this business host, if any. This field is read-only and is determined by the business host class definition.
+
+Adapter Description
+Common to business services and business operations. Comments that describe the adapter class. This field is read-only and displays the first line of the class annotation in the code.
+
+Alert Grace Period
+Specifies an optional grace period during which errors relating to external connections do not trigger alerts (even if Alert On Error is True). If the error condition still exists after the grace period, the business service triggers an alert; otherwise no alert is triggered.
+
+Business processes and operations have a similar setting.
+
+Alert On Error
+Common to all business hosts. When this setting is set to True, as soon as the business host encounters any type of error condition it automatically triggers an alert. An alert writes a message to the Event Log and can also send notification to a user via email or other mechanism. For details, see Configuring Alerts.
+
+Archive IO
+Common to business services and operations. If True, the adapter associated with this business service or operation logs in the I/O archive each input and output communication it shares with the external system.
+
+Business Partner
+Common to all business hosts. Specifies an optional business partner applicable to this business host. Select a business host profile, if available.
+
+A business partner profile is information about an organization or application connected to your InterSystems IRIS system. For each business partner, you can provide information such as the partner name, notes, primary and alternative contacts, and contact details. Defining a profile has no effect on the behavior or running of the production. It simply gives you a means to store more information.
+
+For example, suppose your production talks to ABC Hospital and XYZ Hospital. You can enter profiles for both of these along with contact information. When you configure items that communicate with these organizations, you can specify the defined business partner for each business host.
+
+For information on defining these profiles, see Configuring Business Partners.
+
+Category
+Common to all business hosts. An optional text label that you can use to visually group business hosts within the production diagram. Category names are case-sensitive and can contain space characters.
+
+The Category drop-down list contains all the categories that are used in the current production. Specify this setting as follows:
+
+To specify one category, either type the category name or select it from the Category drop-down list. If you type a category name and it does not yet exist, InterSystems IRIS creates it.
+
+To specify multiple categories, select the check box for each desired category from the Category drop-down list. Or type a comma-separated list of categories.
+
+To delete a category, remove that category selection from all business hosts that use it. If the Category drop-down list still displays the category, that means that the category is still in use. In this case, filter the display to show only business hosts that use that category. Then for each of the business hosts that you see, edit the Category to remove the category.
+
+Class Name
+Common to all business hosts. The business host class name. This field is read-only.
+
+Comment
+Common to all business hosts. An optional text description.
+
+Description
+Common to all business hosts. Comments that describe the business host class. This field is read-only and displays the first line of the class annotation in the code.
+
+Enabled
+Common to all business hosts. Enables the business host, so that it processes messages whenever the production runs. You can also double-click a business host in the diagram to toggle between enabling and disabling it.
+
+When the Enabled check box is clear, the business host is still present in the configuration, and its queue continues to accept messages, but none of these messages are processed until the business host is enabled again.
+
+This setting is useful, for example, if there is a communications breakdown on the external side. For example, if an email server goes down, or something similar happens, you can disable the associated business service until throughput is restored.
+
+The Enabled check box is a setting stored in the production class definition. If the production is read-only due to being managed by source control, you cannot change this setting unless you have checked the production out of source control. If the production is in source control, you can manage the item using the Stop, Start, and Restart buttons on the Action tab without checking the production out of source control. The action of these buttons does not change the production class.
+
+Foreground
+Common to business services and operations. By default, this check box is clear. Select it for debugging or diagnostic purposes only. Jobs in operational systems almost never run in the foreground. When you select the Foreground check box, any system jobs used by the business service run in a Terminal window at the front of the console display. This allows InterSystems IRIS to display debugging or trace messages in that window. See Testing and Debugging Productions.
+
+Generate SuperSession ID
+This setting controls whether the message will have a SuperSessionID, which can be used to identify messages that cross from one production to another. For details, see Supersessions.
+
+Inactivity Timeout
+Common to all business hosts. A business host has an Inactive status after it has not received any messages within the number of seconds specified by the Inactivity Timeout field. The production Monitor Service periodically reviews the status of business services and business operations within the production, and marks the item as Inactive if it has not done anything within the Inactivity Timeout period.
+
+The default value is 0 (zero). If this setting is 0, the business host will never be marked Inactive, no matter how long it stands idle.
+
+Log Trace Events
+Common to all business hosts. Trace messages are informational text messages that InterSystems IRIS can deliver to the Terminal window (if you select the Foreground check box) and, optionally, to the Event Log. Trace messages are unrelated to Visual Trace, which provides a graphical view of production message objects as they travel through a production.
+
+By default, the Log Trace Events check box is clear. When selected, it enables logging of all trace messages issued by this business host. Logging means that InterSystems IRIS writes the trace messages to the console Terminal window (if your job is running in the foreground) and it also stores copies of these messages in the Event Log.
+
+Pool Size
+Common to all business hosts. Specifies how many system jobs to allocate to run this business host.
+
+Notes specific to business services:
+
+For business services, the default is 1.
+
+You must use a value of 0 if the business service is being invoked via the Ens.DirectorOpens in a new tab method CreateBusinessService(); this is called an adapterless business service.
+
+You may use a value greater than 1 with File or FTP inbound adapters if you want multiple jobs competing to pull files from the same input directory, or if you have a TCP Service configured with an exclamation point (!) to make it initiate the connection.
+
+For a full discussion of appropriate pool sizes, see Pool Size and Actor Pool Size.
+
+Schedule
+Common to all business hosts. An optional command string that schedules stop and start times for the business host. The string is a comma-separated list of event specifications, each of which has the following format:
+
+action:YYYY-MM-DDThh:mm:ss
+
+Where action is either START or STOP to indicate the desired event. Type a schedule string or select an existing schedule specification.
+
+For details on the schedule string, see Configuring Schedule Specifications.
+
+Throttle Delay
+Common to business services and business operations. Specifies a period of forced idleness before processing the next message, in milliseconds. The default is 0.
+
+For a business service, the delay occurs before each call to the adapter's OnTask() method. For a business operation, the delay occurs before each attempt to dequeue a new message.
+
+This setting does not apply to SOAP services in CSP mode and other services invoked externally via CreateBusinessService(). It applies on a per-job basis so that operations with Pool Size greater than 1 and services with JobPerConnection as true can still generate multiple messages within the interval.

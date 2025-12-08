@@ -1,0 +1,174 @@
+Settings for the File Inbound Adapter
+Provides reference information for settings of the file inbound adapter, EnsLib.File.InboundAdapterOpens in a new tab. You can configure these settings after you have added a business service that uses this adapter to your production.
+Summary
+The inbound file adapter has the following settings:
+
+Group	Settings
+Basic Settings	File Path, File Spec, Archive Path, Work Path, Call Interval
+Additional Settings	Subdirectory Levels, Charset, Append Timestamp, Semaphore Specification, Fatal Errors, Header Count, Confirm Complete, File Access Timeout
+The remaining settings are common to all business services. For information, see Settings for All Business Services.
+
+Append Timestamp
+Append a time stamp to filenames in the Archive Path and Work Path directories; this is useful to prevent possible name collisions on repeated processing of the same filename.
+
+If this value is empty or 0, no time stamp is appended.
+
+If this setting is 1, then the standard template '%f_%Q' is appended.
+
+For other possible values, see Time Stamp Specifications for Filenames.
+
+Archive Path
+Full pathname of the directory where the adapter should place the input file after it has finished processing the data in the file. This directory must exist, and it must be accessible through the file system on the local InterSystems IRIS® Interoperability machine. If this setting is not specified, the adapter deletes the input file after its call to ProcessInput() returns.
+
+To ensure that the input file is not deleted while your production processes the data from the file, InterSystems recommends that you set Archive Path and Work Path to the same directory. Alternatively, use this adapter in a custom business service and send only synchronous calls from this business service.
+
+Call Interval
+The polling interval for this adapter, in seconds. This is the time interval at which the adapter checks for input files in the specified locations.
+
+Upon polling, if the adapter finds a file, it links the file to a stream object and passes the stream object to the associated business service. If several files are detected at once, the adapter sends one request to the business service for each individual file until no more files are found.
+
+If the business service processes each file synchronously, the files will be processed sequentially. If the business service sends them asynchronously to a business process or business operation, the files might be processed simultaneously.
+
+After processing all the available files, the adapter waits for the polling interval to elapse before checking for files again. This cycle continues whenever the production is running and the business service is enabled and scheduled to be active.
+
+It is possible to implement a callback in the business service so that the adapter delays for the duration of the Call Interval between input files. For details, see Defining Business Services.
+
+The default Call Interval is 5 seconds. The minimum is 0.1 seconds.
+
+Charset
+Specifies the character set of the input file. InterSystems IRIS automatically translates the characters from this character encoding. The setting value is not case-sensitive. Use Binary for binary files, or for any data in which newline and line feed characters are distinct or must remain unchanged. Other settings may be useful when transferring text documents. Choices include:
+
+Binary—Binary transfer
+
+Ascii—ASCII mode FTP transfer but no character encoding translation
+
+Default—The default character encoding of the local InterSystems IRIS server
+
+Latin1—The ISO Latin1 8-bit encoding
+
+ISO-8859-1—The ISO Latin1 8-bit encoding
+
+UTF-8—The Unicode 8-bit encoding
+
+UCS2—The Unicode 16-bit encoding
+
+UCS2-BE—The Unicode 16-bit encoding (Big-Endian)
+
+Any other alias from an international character encoding standard for which NLS (National Language Support) is installed in InterSystems IRIS
+
+Use a value that is consistent with your implementation of OnProcessInput() in the business service:
+
+When the Charset setting has the value Binary, the pInput argument of OnProcessInput() is of type %FileBinaryStreamOpens in a new tab and contains bytes.
+
+Otherwise, pInput is of type %FileCharacterStreamOpens in a new tab and contains characters.
+
+For information on character sets and translation tables, see Translation Tables.
+
+Note:
+The classes %FileCharacterStreamOpens in a new tab and %FileBinaryStreamOpens in a new tab are both deprecated except for use in product APIs such as EnsLib.File.InboundAdapterOpens in a new tab.
+
+Semaphore Specification
+The Semaphore Specification allows you to indicate that the data file or files are complete and ready to be read by creating an associated second file in the same directory that is used as a semaphore. The inbound file adapter waits until the semaphore file exists before checking the other conditions specified by the Confirm Complete requirements and then processing the data file or files. The adapter tests only for the existence of the semaphore file and does not read the semaphore file contents.
+
+If the Semaphore Specification is an empty string, the adapter does not wait for a semaphore file and processes the data files as soon as the conditions specified by the Confirm Complete requirements are met.
+
+If you are using the Semaphore Specification feature, consider setting the Confirm Complete field to None.
+
+Syntax
+Semaphore Specification can be an empty string or can be a series of pairs, each of which associates a data filename specification with a semaphore filename pattern. The pairs are separated by semicolons:
+
+DataFileSpec=SemaphorePattern;DataFileSpec=SemaphorePattern;...
+
+DataFileSpec is either a plain filename or a filename specification that includes the * wildcard (which matches any character). SemaphorePattern directly or indirectly specifies the name of the associated semaphore file; it can be either of the following:
+
+A plain filename (such as SemaphoreFile.SEM). In this case, when the system finds a file that matches DataFileSpec, the system looks for a file with that exact name.
+
+A string of the form *.extension such as *.sem. In this case, when the system finds a file that matches DataFileSpec, the system looks for a file with the same name, but with the sem extension instead. For example, if the filename ABCDEF.txt matches DataFileSpec, the system looks for a semaphore file named ABCDEF.sem
+
+When looking for a semaphore file based on a data filename, the system looks only at the part of the data filename before the first period. For example, if the filename test.txt.data.zip.tar matches DataFileSpec, if the semaphore filename pattern is *.sem the system looks for a semaphore file named test.sem
+
+Notes:
+
+The semaphore file associated with a given data file (or multiple data files) must be in the same directory as those files.
+
+DataFileSpec and SemaphorePattern do not include the directory name.
+
+DataFileSpec is always case-sensitive.
+
+SemaphorePattern is case-sensitive if the operating system is case-sensitive and is not case-sensitive otherwise.
+
+The pairs are processed left-to-right, and the first matching pair is used; see How the Inbound File Adapter Uses Semaphore Specification.
+
+Consequently, if you are including multiple specifications that can match the same file, you should specify the more specific specification before the more general ones.
+
+If an adapter configured with a FileSpec equal to *, the adapter usually considers all files in the directory as data files. But if Semaphore Specification is also specified, the adapter can recognize a file as a semaphore file and not treat it as a data file.
+
+For example, consider the following Semaphore Specification, consisting of a single pair:
+
+ABC*.TXT=ABC*.SEM
+
+In this case, the ABCTest.SEM semaphore file controls when the adapter processes the ABCTest.TXT file and that the ABCdata.SEM semaphore file controls when the adapter processes the ABCdata.txt file.
+
+In the simplest case, Semaphore Specification can consist only of a single SemaphorePattern, which may or may not include a wildcard. This means that the presence or absence of that semaphore file controls whether the adapter processes any files.
+
+Files That Do Not Match a Pattern
+If a Semaphore Specification is specified and a given data file does not match any of the patterns, then the adapter will not process this data file. If this is undesirable, specify a final pair that will match any file and that uses its own semaphore file. For example, consider this Semaphore Specification:
+
+*.DAT=*.SEM; *.DOC=*.READY; *=SEM.LAST
+
+The SEM.LAST is the semaphore file for all files that do not end with .DAT or .DOC.
+
+How the Inbound File Adapter Uses Semaphore Specification
+Within each polling cycle, the inbound file adapter examines all the files found within the configured directory (and any subdirectories). Then for each file:
+
+The adapter reads the Semaphore Specification from left-to-right, finding the first specification whose DataFileSpec matches the given filename. This indicates the name of the semaphore file to look for.
+
+The adapter looks for the semaphore file in the same directory as the file being examined.
+
+Then:
+
+If it does not find the semaphore file, the adapter skips the file and sets an internal flag that causes the adapter to wait until the next polling cycle.
+
+If it does find the semaphore file, the adapter processes the file.
+
+After the adapter has processed through all the data files in a polling cycle, it deletes all the corresponding semaphore files.
+
+Fatal Errors
+For record map services, determines whether the system stops processing a message when it encounters an error such as a validation error in an individual record. When configuring the adapter, choose one of the following options:
+
+Any—This is the default. If InterSystems IRIS encounters an error when saving an individual record, it stops processing the message.
+
+ParseOnly—If InterSystems IRIS encounters an error when saving an individual record, it logs the error, skips the record, and then continues parsing the message. The log includes the position in the stream of the invalid record. Additionally, if Alert On Error is enabled, the system generates an alert.
+
+Header Count
+For record map services, determines the number of lines that the service ignores as prefix lines in incoming documents. Ignoring prefix lines enables the services to parse reports and comma-separated values (CSV) files with column headers.
+
+Confirm Complete
+Indicates the special measures that InterSystems IRIS should take to confirm complete receipt of a file. The options are:
+
+List option	Integer value	Description
+None	0	Take no special measures to determine if a file is complete.
+Size	1	Wait until the reported size of the file in the FilePath directory stops increasing. This option may not be sufficient when the source application is sluggish. If the operating system reports the same file size for a duration of the File Access Timeout setting, then InterSystems IRIS Interoperability considers the file complete.
+Rename	2	Read more data for a file until the operating system allows InterSystems IRIS to rename the file.
+Readable	4	Consider the file complete if it can open it in Read mode.
+Writable	8	Consider the file complete if it can open it in Write mode (as a test only; it does not write to the file).
+The effectiveness of each option depends on the operating system and the details of the process that puts the file in the File Path directory.
+
+File Access Timeout
+Amount of time in seconds that the system waits for information from the source application before confirming the complete receipt of a file. For more information, see Confirm Complete.
+
+If you supply a decimal value, the system rounds the value up to the nearest whole number. The default value is 2.
+
+File Path
+Full pathname of the directory in which to look for files. This directory must exist, and it must be accessible through the file system on the local InterSystems IRIS Interoperability machine.
+
+File Spec
+Filename or wildcard file specification for file(s) to retrieve. For the wildcard specification, use the convention that is appropriate for the operating system on the local InterSystems IRIS Interoperability machine.
+
+Subdirectory Levels
+Number of levels of subdirectory depth under the given directory that should be searched for files.
+
+Work Path
+Full pathname of the directory where the adapter should place the input file while processing the data in the file. This directory must exist, and it must be accessible through the file system on the local InterSystems IRIS Interoperability machine. This setting is useful when the same filename is used for repeated file submissions. If no WorkPath is specified, the adapter does not move the file while processing it.
+
+To ensure that the input file is not deleted while your production processes the data from the file, InterSystems recommends that you set Archive Path and Work Path to the same directory. Alternatively, you can use only synchronous calls from your business service to process the data.

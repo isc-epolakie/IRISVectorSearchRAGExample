@@ -1,0 +1,76 @@
+Settings for the SOAP Outbound Adapter
+Provides reference information for settings of the SOAP outbound adapter, EnsLib.SOAP.OutboundAdapterOpens in a new tab. You can configure these settings after you have added a business operation that uses this adapter to your production.
+Summary
+The outbound SOAP adapter has the following settings:
+
+Group	Settings
+Basic Settings	Web Service URL, Web Service Client Class, SOAP Credentials, Credentials
+Connection Settings	SSL Configuration, SSL Check Server Identity
+Proxy Settings	Proxy Server, Proxy Port, Proxy HTTPS, ProxyHttpTunnel, ProxyHttpSSLConnect
+Delayed Response Support	Include Request Key In HTTP Header
+Additional Settings	ResponseTimeout, HttpVersion, ConnectTimeout, SendSuperSession
+The remaining settings are common to all business operations. For information, see Settings for All Business Operations.
+
+ConnectTimeout
+Specifies the number of seconds to wait for the connection to the server to open. The default value is 5.
+
+If the connection is not opened in this time period, the adapter retries repeatedly, up to the number of times given by Failure Timeout divided by Retry Interval.
+
+Credentials
+Specify the ID of the production credentials that contain the username and password to be used in the HTTP header. See Defining Production Credentials.
+
+HttpVersion
+Specifies the HTTP version that the adapter should report in the HTTP request it sends to the server.
+
+Include Request Key in HTTP Header
+Specifies whether the request key should be included in the HTTP headers. The default is disabled.
+
+If checked, the key will either be VND.InterSystems.IRIS.RequestKey or VND.InterSystems.IRIS.RetryRequestKey and have a value of a System GUID, the current namespace, and the current request header ID.
+
+The HTTP header will also include VND.InterSystems.IRIS.ResponseTimeout and have a value of ResponseTimeout.
+
+This setting is intended to be used in conjunction with an IRIS Interoperability production SOAP service with delayed response support enabled.
+
+This setting should not be enabled if the request payload is changed by the host class on retrying and has a different expected response from the original request.
+
+ProxyHTTPS
+Specifies whether the proxy (if any) uses HTTPS to communicate with the real HTTP/HTTPS server.
+
+ProxyHttpTunnel
+Specifies whether the adapter uses the HTTP CONNECT command to establish a tunnel through the proxy to the target HTTP server. If true, the request uses the HTTP CONNECT command to establish a tunnel. The address of the proxy server is taken from the Proxy Server and Proxy Port properties. If Proxy Https SSL Connect is true, then once the tunnel is established, InterSystems IRIS® negotiates the TLS connection. The default value is false.
+
+ProxyPort
+Specifies the proxy server port on which to send HTTP requests, if using a proxy server. The default value is 80.
+
+ProxyServer
+Specifies the proxy server through which to send HTTP requests, if any.
+
+ProxyHttpSSLConnect
+Specifies whether the adapter should use a proxy TLS connection to the proxy. Note that the use of TLS to the eventual endpoint is determined by the protocol part of web service's location URL.
+
+ResponseTimeout
+Specifies the timeout for getting a response from the remote web server (the timeout for opening the connection to the server is set by ConnectTimeout). The default value is 30.
+
+SendSuperSession
+Controls whether to include the SuperSessionID property in the outgoing message. For details, see Supersessions.
+
+SOAPCredentials
+Specify the ID of the production credentials that contain the username and password to be used in the WS-Security header of the SOAP request. See Defining Production Credentials. For more information on WS-Security support, see Securing Web Services.
+
+SSLCheckServerIdentity
+Specifies that when making a TLS connection, the adapter should check that the server identity in the certificate matches the name of the system being connecting to. This defaults to specifying that the check should be made. Uncheck this for test and development systems where the name specified in the TLS certificate does not match the DNS name.
+
+SSLConfig
+The name of an existing TLS configuration to use to authenticate this connection. Choose a client TLS configuration, because the web client initiates the communication.
+
+To create and manage TLS configurations, use the Management Portal. See InterSystems TLS Guide. The first field on the Edit SSL/TLS Configuration page is Configuration Name. Use this string as the value for the SSLConfig setting.
+
+Note:
+You must also ensure the web service is at a URL that uses https://. The web service location is determined by the WebServiceURL setting; if this is not specified, the InterSystems IRIS web client assumes the web service is at the URL specified by the LOCATION parameter in proxy client class.
+
+WebServiceClientClass
+Specifies the full name (including package) of the proxy client class, specifically the class that actually sends and receives SOAP messages to the web service.
+
+WebServiceURL
+Specifies the URL where the web service is located. If this setting is not given, the adapter uses the default location (the LOCATION parameter) declared in the proxy client class; see the WebServiceClientClass setting. Note that TLS will only work if this URL uses https://
+

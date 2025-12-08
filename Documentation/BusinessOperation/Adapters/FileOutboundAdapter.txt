@@ -1,0 +1,23 @@
+Settings for the File Outbound Adapter
+Provides reference information for settings of the file outbound adapter, EnsLib.File.OutboundAdapterOpens in a new tab. You can configure these settings after you have added a business operation that uses this adapter to your production.
+Summary
+The outbound file adapter has the following settings:
+
+Group	Settings
+Basic Settings	File Path
+Additional Settings	Overwrite, Charset, Open Timeout
+The remaining settings are common to all business operations. For information, see Settings for All Business Operations.
+
+Charset
+Specifies the desired character set for the output file. InterSystems IRIS® automatically translates the characters to this character encoding. See Charset in Settings for the File Inbound Adapter.
+
+File Path
+Full pathname of the directory into which to write output files. This directory must exist, and it must be accessible through the file system on the local InterSystems IRIS Interoperability machine.
+
+Open Timeout
+Amount of time for the adapter to wait on each attempt to open the output file for writing.
+
+The default is 5 seconds.
+
+Overwrite
+If a file of the same name exists in the FilePath directory, the Overwrite setting controls what happens. If True, overwrite the file. If False, append the new output to the existing file.

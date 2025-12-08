@@ -1,0 +1,51 @@
+Adding a Business Process
+To add a business process to a production:
+
+Add a business host, choosing the Process Host option.
+
+For Process Type option, choose one of the following:
+
+General—Use this to create a business process other than the following types.
+
+HL7—Use this to create a business process for working with HL7 messages.
+
+X12—Use this to create a business process for working with X12 messages.
+
+Component—Use this to create a business process as a component.
+
+(General or Component) Process Class—Choose a base class from the list of valid business process classes. If the class you need does not appear on this list, create and compile the class and then return here to choose it.
+
+Name—Specify a name; see Configuration Names. 
+
+"Configuration Names
+By default, the name of a configuration item is the name of its underlying host class. However, you can assign a different name, to describe the purpose of the item, for example.
+
+For example, if you have a business service class that communicates with a specific type of server, and you use it to communicate with the same type of server in different enterprise locations, you must configure the business service with different settings to communicate with each enterprise location, even though the type of server is the same. Each different configuration of the business service must have a different name.
+
+The following rules govern configuration names:
+
+The name must consist of at least one character.
+
+The name can contain letters, numbers, and any printable character except for the following:
+
+| ; , : [ < > \ / & "
+
+Neither the first nor the last character can be any of the following: ! $ .
+
+The first character cannot be _
+
+The name (if is it one character long) cannot be *"
+
+(HL7 or X12) Specify the following details:
+
+Auto-Create Rule—Select this check box to create a rule definition name based on the business process class name. When this option is selected, you can use the Rule or Package Name field to specify a package name that will be added to the name of the rule created for the new router. If you do not specify a New Rule Package value, the production’s package is used. In most cases, the Rule or Package Name field is ignored if the Routing Process Name field begins with a package name. However, if the package specified by the Routing Process Name field is the system package name Ens or Enslib, a rule that is auto-created will have a different package name added to the beginning of the rule name. This additional package is determined by the contents of the New Rule Package field. If the package of the production or routing process is used instead of a specified value, the generated rule class name ends with 'RoutingRule'.
+
+Display Category—Specify a category name for use in sorting and organizing items within the production. Category names are case-sensitive, and space characters are allowed. To place an item in multiple categories, list them in the Display Category field separated by commas (with no spaces around these commas).
+
+Comment—Specify an optional text description.
+
+Enable Now—Optionally select this to immediately enable the item.
+
+Click Create.
+
+Also see Settings in All Business Processes.

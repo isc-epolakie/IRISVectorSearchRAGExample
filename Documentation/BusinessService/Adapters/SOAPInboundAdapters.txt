@@ -1,0 +1,86 @@
+Settings for the SOAP Inbound Adapter
+Provides reference information for settings of the SOAP inbound adapter, EnsLib.SOAP.InboundAdapterOpens in a new tab. You can configure these settings after you have added a business service that uses this adapter to your production. Also see Creating a Web Service in a Production, which does not require this adapter.
+Summary
+The inbound SOAP adapter has the following settings:
+
+Group	Settings
+Basic Settings	Port, Call Interval
+Connection Settings	Enable Standard Requests, Adapter URL, Job Per Connection, Allowed IP Addresses, OS Accept Connection Queue Size, Stay Connected, Read Timeout, SSL Configuration, Local Interface
+Delayed Response Support	Support Delayed Sync Request, Override Client Response Wait Timeout, Gateway Timeout
+Additional Settings	Generate SuperSession ID
+The remaining settings are common to all business services. For information, see Settings for All Business Services.
+
+Adapter URL
+A specific URL for the service to accept requests on. For SOAP services invoked through the SOAP inbound adapter on a custom local port, this setting allows a custom URL to be used instead of the standard csp/namespace/classname style of URL.
+
+Allowed IP Addresses
+Specifies a comma-separated list of remote IP addresses from which to accept connections. The adapter accepts IP addresses in dotted decimal form. An optional :port designation is supported, so either of the following address formats is acceptable: 192.168.1.22 or 192.168.1.22:3298.
+
+Note:
+IP address filtering is a means to control access on private networks, rather than for publicly accessible systems. InterSystems does not recommend relying on IP address filtering as a sole security mechanism, as it is possible for attackers to spoof IP addresses.
+
+If a port number is specified, connections from other ports will be refused.
+
+If the string starts with an exclamation point (!) character, the inbound adapter initiates the connection rather than waiting for an incoming connection request. The inbound adapter initiates the connection to the specified address and then waits for a message. In this case, only one address may be given, and if a port is specified, it supersedes the value of the Port setting; otherwise, the Port setting is used.
+
+Call Interval
+Specifies the number of seconds that the adapter will listen for incoming data from its configured source, before checking for a shutdown signal from the production framework.
+
+If the adapter finds input, it acquires the data and passes it to the business service. The business service processes the data, and then the adapter immediately begins waiting for new input. This cycle continues whenever the production is running and the business service is enabled and scheduled to be active.
+
+The default is 5 seconds. The minimum is 0.1 seconds.
+
+Enable Standard Requests
+If this setting is true, the adapter can also receive SOAP requests in the usual way (that is, via the Web Gateway port, rather than the TCP connection). The default is false.
+
+Note:
+Note that if the adapter uses the Web Gateway port, First-In-First-Out processing for messages is not supported.
+
+Gateway Timeout
+Specifies the expected timeout (in seconds) of the external TCP socket system.
+
+The default value is “IRIS” which allows the adapter to use the IRIS web gateway timeout value found in the request headers as long as the incoming request comes through an IRIS web application. Otherwise, the default value will be 60 seconds.
+
+Generate SuperSession ID
+This setting controls whether the message will have a SuperSessionID, which can be used to identify messages that cross from one production to another. For details, see Supersessions.
+
+Job Per Connection
+If this setting is true, the adapter spawns a new job to handle each incoming TCP connection and allows simultaneous handling of multiple connections. When false, it does not spawn a new job for each connection. The default is true.
+
+Local Interface
+Specifies the network interface through which the connection should go. Select a value from the list or type a value. An empty value means use any interface.
+
+OS Accept Connection Queue Size
+Specifies the number of incoming connections should the operating system should hold open. Set to 0 if only one connection at a time is expected. Set to a large number if many clients will connecting rapidly.
+
+Override Client Response Wait Timeout
+Specifies the expected response wait time (in seconds) for the client.
+
+The default is 0 which uses the timeout set by the client.
+
+If the client is an IRIS Interoperability production SOAP operation, the client response time will be included in the HTTP headers.
+
+Port
+Identifies the TCP port on the local machine where the adapter is listening for SOAP requests. Avoid specifying a port number that is in the range used by the operating system for ephemeral outbound connections.
+
+Read Timeout
+Specifies the number of seconds to wait for each successive incoming TCP read operation, following receipt of initial data from the remote TCP port. The default is 5 seconds. The range is 0–600 seconds (a maximum of 10 minutes).
+
+SSL Config
+The name of an existing TLS configuration to use to authenticate this connection. This should be a server configuration.
+
+To create and manage TLS configurations, use the Management Portal. See InterSystems TLS Guide. The first field on the Edit SSL/TLS Configuration page is Configuration Name. Use this string as the value for the SSLConfig setting.
+
+Stay Connected
+Specifies whether to keep the connection open between requests.
+
+If this setting is 0, the adapter will disconnect immediately after every event.
+
+If this setting is -1, the adapter auto-connects on startup and then stays connected.
+
+This setting can also be positive (which specifies the idle time, in seconds), but such a value is not useful for this adapter, which works by polling. If the idle time is longer than the polling interval (that is, the CallInterval) the adapter stays connected all the time. If the idle time is shorter than the polling interval, the adapter disconnects and reconnects at every polling interval.
+
+Support Delayed Sync Request
+Specifies whether delayed sync requests are enabled. The default is disabled.
+
+If the client provides unique ClientRequestKey and ClientRetryRequestKey, then the SendRequestSync carried out by this service will attempt to prevent processing the same request multiple times if the client times out waiting for the initial response and retries.

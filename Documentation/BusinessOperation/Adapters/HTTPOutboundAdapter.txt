@@ -1,0 +1,70 @@
+Settings for the HTTP Outbound Adapter
+Provides reference information for settings of the HTTP outbound adapter, EnsLib.HTTP.OutboundAdapterOpens in a new tab. You can configure these settings after you have added a business operation that uses this adapter to your production.
+Summary
+The outbound HTTP adapter has the following settings:
+
+Group	Settings
+Basic Settings	HTTP Server, HTTP Port, URL, Credentials
+Connection Settings	SSL Configuration, SSL Check Server Identity, Proxy Server, Proxy Port, Proxy HTTPS, Proxy Http Tunnel, Response Timeout, ConnectTimeout, WriteTimeout, LocalInterface
+Additional Settings	Use Cookies, SendSuperSession
+The remaining settings are common to all business operations. For information, see Settings for All Business Operations.
+
+Connect Timeout
+Specifies the number of seconds to wait for the connection to the server to open. The default value is 5.
+
+If the connection is not opened in this time period, the adapter retries repeatedly, up to the number of times given by Failure Timeout divided by Retry Interval.
+
+Credentials
+ID of the production credentials that can authorize a connection to the given destination URL. See Defining Production Credentials.
+
+HTTP Port
+TCP port on the server to send HTTP requests to (will use 80 by default, or 443 if SSLConfig is specified). Values other than 80 are included in the Host: header of the HTTP request that you are sending. For more information, see Specifying the Destination Server and URL Path.
+
+HTTP Server
+IP address of the server to send HTTP requests to. This is used in the Host: header of the HTTP request that you are sending. Also see Specifying the Destination Server and URL Path.
+
+Local Interface
+Specifies the network interface through which the HTTP connection should go. Select a value from the list or type a value. An empty value means use any interface.
+
+Proxy HTTPS
+If using a proxy server, indicates whether the proxy server communicates with the target system using HTTPS. If you enable this option and specify a value in the Proxy Server property, then the proxy server issues requests for HTTPS pages rather than HTTP pages. Additionally, enabling this option changes the default HTTP Port to 443, which is the HTTPS port.
+
+Proxy Port
+If using a proxy server, specifies the port on the proxy server to connect to. The default value is 8080.
+
+Proxy Server
+If using a proxy server, specifies the proxy server host name. Requests are made to the proxy server that you specify on the Proxy Port that you specify. If you do not specify a value, a proxy server is not used.
+
+Proxy HTTP Tunnel
+Specifies whether the adapter uses the HTTP CONNECT command to establish a tunnel through the proxy to the target HTTP server. If true, the request uses the HTTP CONNECT command to establish a tunnel. The address of the proxy server is taken from the Proxy Server and Proxy Port properties. If Proxy Https is true, then once the tunnel is established, InterSystems IRIS® negotiates the TLS connection. The default value is false.
+
+Response Timeout
+Specifies the timeout for getting a response from the server (the timeout for opening the connection to the server is set by ConnectTimeout). The default value is 30.
+
+If no response is received, the adapter retries repeatedly, up to the number of times given by Failure Timeout divided by Retry Interval.
+
+SSL Check Server Identity
+Specifies that when making a TLS connection, the adapter should check that the server identity in the certificate matches the name of the system being connecting to. This defaults to specifying that the check should be made. Clear this for test and development systems where the name specified in the TLS certificate does not match the DNS name.
+
+SSL Configuration
+The name of an existing TLS configuration to use to authenticate this connection.
+
+When using with the HTTP inbound adapter, choose a server TLS configuration.
+
+When using with the HTTP outbound adapter, choose a client TLS configuration, because the adapter initiates the communication.
+
+To create and manage TLS configurations, use the Management Portal. See InterSystems TLS Guide. The first field on the Edit SSL/TLS Configuration page is Configuration Name. Use this string as the value for the SSL Configuration setting.
+
+SendSuperSession
+Controls whether to include the SuperSessionID property in the outgoing message. For details, see Supersessions.
+
+URL
+URL path to request from the server (not including http:// or the server address).
+
+Also see Specifying the Destination Server and URL Path.
+
+Use Cookies
+Specifies whether to save cookies received in HTTP responses while this adapter is instantiated, and insert them in each subsequent HTTP request.
+
+WriteTimeout
+Specifies a timeout value for writes to the web server. If this setting is null, there is no timeout.

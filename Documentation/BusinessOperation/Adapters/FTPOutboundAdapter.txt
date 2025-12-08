@@ -1,0 +1,91 @@
+Settings for the FTP Outbound Adapter
+Provides reference information for settings of the FTP outbound adapter, EnsLib.FTP.OutboundAdapterOpens in a new tab. You can configure these settings after you have added a business operation that uses this adapter to your production.
+Summary
+The outbound FTP adapter has the following settings:
+
+Group	Settings
+Basic Settings	External Registry ID, FTP Server, FTP Port, Credentials, File Path
+SFTP Settings	SFTP Append Mode, SFTP Authentication Methods, SFTP Public Key File, SFTP Private Key File, SFTP Server Character Set, SFTP Local Character Set, SFTP Passphrase Credentials, SFTP Interactive DTL, SFTP File Access Mode
+Connection Settings	Protocol, SSL Configuration, SSL Check Server Identity, UsePASV, Stay Connected, Connect Timeout
+FTP	Command Translate Table
+Additional Settings	Overwrite, Charset, Semaphore Specification
+The remaining settings are common to all business operations. For information, see Settings for All Business Operations.
+
+Charset
+Specifies the desired character set for the output file. InterSystems IRIS® automatically translates the characters to this character encoding. See Charset.
+
+Command Translate Table
+Specifies the translate table to use for the command channel, specifically for the filename/pathnames. Normally this should not be specified in which case if the FTP server supports UTF8 then the adapter uses it for the filename/pathnames, if the server does not support UTF8 then the adapter uses RAW mode and just reads the bytes as sent. It is possible for a server to provide the filename list in RAW and for it to support UTF8. In this case it might be necessary to set the Command Translate Table to RAW to override the detected UTF8. The values shown in the list are the internal table names.
+
+Connect Timeout
+Number of seconds to wait on each attempt to connect to the FTP server. The default is 5 seconds.
+
+Credentials
+Identifies a production credentials entry that can authorize a connection to the FTP server. See Credentials.
+
+File Path
+Full pathname of the directory on the FTP server in which to write files. This directory must exist, and it must be accessible using the Credentials provided.
+
+FTP Port
+Identifies the TCP port on the FTP server to connect to. The default value is 21.
+
+FTP Server
+Identifies the FTP server to connect to. This can be the IP address or server name, as long as the domain host controller can resolve the name.
+
+Overwrite
+True or False. If True, and the output file exists, overwrite it. If False, and the output file exists, append to it. The default is True.
+
+Protocol
+Indicates whether to use FTP (File Transfer Protocol) or SFTP (SSH File Transfer Protocol). If the protocol is FTP, it is possible to use the SSL Configuration setting to configure FTP over TLS. If the protocol is SFTP, then:
+
+UsePASV and ServerListStyle settings are ignored.
+
+FTP Port setting should ordinarily be set to 22.
+
+You must supply a value for the Credentials setting.
+
+If you supply values for the SFTPPublicKeyFile and SFTPPrivateKeyFile settings, the adapter attempts key pair authentication. It does this in conjunction with the username and password supplied via the Credentials setting, using the password in the Credentials as the passphrase for the private key. If you do not use the KeyFile settings, the adapter attempts only username/password authentication based on the Credentials setting.
+
+This setting specifies whether to use FTP or SFTP. If it is left blank, then FTP is used, unless the SSL Configuration setting is !SFTP. In this case, SFTP is used irrespective of the Protocol setting.
+
+Semaphore Specification
+See Semaphore Specification for the FTP inbound adapter.
+
+SFTP Append Mode
+Controls whether to use the SFTP server append (Server mode) or to emulate an append on the client (Client mode). Some SFTP servers do not support append access. If you are using a server that does not support append, select Client mode and the FTP outbound adapter reads the file from the SFTP server, appends the data to the file and then sends the file back to the SFTP server overwriting the existing file. This setting is only meaningful if SSL Configuration is set to !SFTP and Overwrite is set to false.
+
+A consequence of emulating an append is that if another process modifies the same file on the SFTP server between the time that the adapter reads the file and the time that it writes the file with the appended data, the updates from the other process are lost.
+
+Note:
+If you are unsure whether the SFTP server supports append access, you can use a server append test that is accessible through a link on the SFTP Append Mode popup help text.
+
+SFTP File Access Mode
+Specifies the access permissions to assign to the file on the remote system when transferred. It can be specified as either octal such as 0600, or symbolic such as u+rw,g+r. The default is 0600. If specifying octal, four digits are required. For symbolic and specifying “all,” use 'ugo'.
+
+If an error occurs with the SetPermissions call (for example if the target file has been removed), the error is logged as a Warning and is not used to indicate the Put failed.
+
+SFTP Private Key File
+File path to a file containing the SSH private key certificate. Private keys should be PEM encoded. You need both a private and public key for use with AuthenticateWithKeyPairOpens in a new tab. See OpenSSH and PEM-Encoded Keys.
+
+SFTP Public Key File
+File path to a file containing the SSH public key certificate. Public keys should be in OpenSSH format. You need both a private and public key for use with AuthenticateWithKeyPairOpens in a new tab. See OpenSSH and PEM-Encoded Keys.
+
+SSL Config
+The name of an existing client TLS configuration to use to authenticate this connection. Choose a client rather than a server TLS configuration, because the adapter initiates the communication. See SSL Config in Settings for the FTP Inbound Adapter.
+
+For prior version compatibility, a value of !SFTP indicates the protocol is SFTP. However, the recommendation is to use the Protocol setting to use SFTP.
+
+SSL Check Server Identity
+When connecting to an FTP server via TLS, the server name in the certificate must match the DNS name used to connect to the server. This match is based on the rules in section 3.1 of RFC 2818.
+
+SSL Use Session Resumption
+If this setting is enabled, then when making the SSL connection for the data channel, the adapter reuses session parameters from the command channel. This option requires OpenSSL v1.1.x+.
+
+Stay Connected
+If a positive value, the adapter stays connected to the remote system for this number of seconds after completing an operation. A zero value means to disconnect immediately after every operation. The default of -1 means to stay permanently connected, even during idle times. Adapters are assumed idle at startup and therefore only auto-connect if they are configured with a value of -1.
+
+UsePASV
+Use Passive FTP mode: server returns a data port address and the client connects to it. Most firewalls are more tolerant of Passive mode FTP because both the control and data TCP connections are initiated by the client.
+
+Use SetPermissions Call
+Applicable when the adapters uses Put to write a file to the server; in this case, the SFTP server may apply a umask. A separate SetPermissions call that might not be modified by a umask can be made to apply the requested permissions. The default is to use an extra SetPermissions call. If the SFTP File Access Mode is 0600 a SetPermissions call will not be made irrespective of this setting. Note - this call may not succeed if the target file has already been collected on the server. A Warning will be issued if the SetPermissions call errors.

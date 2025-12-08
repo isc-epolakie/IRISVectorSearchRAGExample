@@ -1,0 +1,147 @@
+Settings for the TCP Inbound Adapters
+Provides reference information for settings of the TCP inbound adapters. You can configure these settings after you have added a business service that uses one of these adapters to your production.
+Summary
+The inbound TCP adapters have the following settings:
+
+Group	Settings
+Basic Settings	Port, Call Interval
+Connection Settings	Job Per Connection, Allowed IP Addresses, OS Accept Connection Queue Size (QSize), Stay Connected, Read Timeout, SSL Configuration, Local Interface
+Additional Settings	Accept Classnames, Charset
+The remaining settings are common to all business services. For information, see Settings for All Business Services.
+
+Accept Classnames
+Applies to EnsLib.TCP.CountedXMLInboundAdapterOpens in a new tab.
+
+Comma-separated list, giving the names of classes that this adapter will instantiate from XML blocks received.
+
+Allowed IP Addresses
+Applies to all inbound TCP adapters.
+
+A comma-separated list of remote IP addresses from which to accept connections. The adapter accepts IPV4 addresses, IPV6 addresses, or server names that the domain host controller can resolve. An optional :port designation is supported; so, for example, both of the following address formats are acceptable: 192.168.1.22 or 192.168.1.22:3298.
+
+Note:
+IP address filtering is a means to control access on private networks, rather than for publicly accessible systems. InterSystems does not recommend relying on IP address filtering as a sole security mechanism, as it is possible for attackers to spoof IP addresses.
+
+If a port number is specified, connections from other ports will be refused.
+
+If the string starts with an exclamation point (!) character, the inbound adapter initiates the connection rather than waiting for an incoming connection request. The inbound adapter initiates the connection to the specified address and then waits for a message. In this case, only one address may be given, and if a port is specified, it supersedes the value of the Port setting; otherwise, the Port setting is used.
+
+Call Interval
+Applies to all inbound TCP adapters.
+
+Number of seconds that the adapter will listen for incoming data from its configured source, before checking for a shutdown signal from the production framework.
+
+If the adapter finds input, it acquires the data and passes it to the business service. The business service processes the data, and then the adapter immediately begins waiting for new input. This cycle continues whenever the production is running and the business service is enabled and scheduled to be active.
+
+The default CallInterval is 5 seconds. The minimum is 0.1 seconds.
+
+Charset
+Applies to EnsLib.TCP.CountedInboundAdapterOpens in a new tab, EnsLib.TCP.CountedXMLInboundAdapterOpens in a new tab, and EnsLib.TCP.TextLineInboundAdapterOpens in a new tab.
+
+Specifies the character set of the inbound data. InterSystems IRIS® automatically translates the characters from this character encoding. The setting value is not case-sensitive. Use Binary for binary files, or for any data in which newline and line feed characters are distinct or must remain unchanged. Other settings may be useful when transferring text documents. Choices include:
+
+Binary—Binary transfer (the default)
+
+Ascii—Ascii mode FTP transfer but no character encoding translation
+
+Default—The default character encoding of the local InterSystems IRIS server
+
+Latin1—The ISO Latin1 8-bit encoding
+
+ISO-8859-1—The ISO Latin1 8-bit encoding
+
+UTF-8—The Unicode 8-bit encoding
+
+UCS2—The Unicode 16-bit encoding
+
+UCS2-BE—The Unicode 16-bit encoding (Big-Endian)
+
+Any other alias from an international character encoding standard for which NLS (National Language Support) is installed in InterSystems IRIS
+
+For information on character sets and translation tables, see Translation Tables.
+
+Endian
+Applies to EnsLib.TCP.CountedInboundAdapterOpens in a new tab and EnsLib.TCP.CountedXMLInboundAdapterOpens in a new tab.
+
+A choice of Big or Little indicates the byte order of the 4-byte block count prefix. Big endian means the most significant byte (MSB) goes over the wire first; Little endian means the least significant byte (LSB) goes over the wire first. The default value for this string is Big.
+
+Job Per Connection
+Applies to all inbound TCP adapters.
+
+When True, the adapter spawns a new job to handle each incoming TCP connection and allows simultaneous handling of multiple connections. When False, it does not spawn a new job for each connection. False is usually the appropriate choice for X12 connections. The default is True.
+
+For TCP services, JobPerConnection causes each new incoming socket connection to be handled by a freshly spawned job rather than by the listener job itself. However, only one job at a time can be the listener, and one job must be the listener. So TCP services configured with PoolSize greater than 1 still only start one listener job. However, this listener can spawn an unlimited number of connection jobs if JobPerConnection is set to True.
+
+If the PoolSize setting is configured to a value greater than 1, it serves as a limit on the number of simultaneous connection jobs that can exist. When this limit is reached, the listener does not accept any more connections until one or more of the existing connection jobs quits or dies. An Event Log warning appears when it first reaches the limit.
+
+Local Interface
+Applies to all inbound TCP adapters.
+
+Specifies the network interface through which the TCP connection should go. Select a value from the list or type a value. An empty value means use any interface.
+
+OS Accept Connection Queue Size (QSize)
+Applies to all inbound TCP adapters.
+
+Specifies the number of incoming connections the operating system should hold in reserve on behalf of this business service. Set to 0 if only 1 connection at a time is expected and subsequent connections ought to be refused immediately by the operating system. Set to a large number if you expect many clients to connect rapidly. The default is 100. The range is 0–1000, however the maximum incoming connections is dependent on the TCP implementations.
+
+Note:
+If this is set to 0, a client attempting to connect will be refused connection if the business service is processing a previous incoming connection. This could lead to a scenario where a client is connected to the business service, but disconnects and attempts to reconnect again in the brief period before the listening socket is reopened. As a result, the client will not try to reconnect.
+
+For HL7 and X12 TCP inbound adapters, the default is set to 0. This supports the HL7 First In, First Out (FIFO) strategy where only one connection at a time is expected.
+
+Port
+Applies to all inbound TCP adapters.
+
+Identifies the TCP port on the local machine where the adapter is listening for TCP requests. Avoid specifying a port number that is in the range used by the operating system for ephemeral outbound connections.
+
+Note:
+After configuring a production that uses inbound TCP adapters, InterSystems recommends that you use the Port Authority report to check for port conflicts.
+
+Read Timeout
+Applies to all TCP adapters.
+
+Number of seconds to wait for each successive incoming TCP read operation, following receipt of initial data from the remote TCP port. The default is 5 seconds. The range is 0–600 seconds (a maximum of 10 minutes).
+
+SSLConfig
+Applies to all TCP adapters.
+
+The name of an existing TLS configuration to use to authenticate this connection. Choose a client TLS configuration, because the adapter initiates the communication.
+
+To create and manage TLS configurations, use the Management Portal. See InterSystems TLS Guide. The first field on the Edit SSL/TLS Configuration page is Configuration Name. Use this string as the value for the SSLConfig setting.
+
+Stay Connected
+Applies to all TCP adapters.
+
+Specifies how long the adapter stays connected to a remote system after an input event and determines how the adapter handles disconnections.
+
+You can specify any of the following values:
+
+A positive value—The adapter remains connected to the remote system for this number of seconds. Disconnections are not handled like errors.
+
+0—The adapter disconnects immediately. Disconnections are not handled like errors.
+
+–1—The adapter is permanently connected, including during idle times. Disconnections are handled like errors.
+
+Note:
+Adapters auto-connect at startup only if the Stay Connected value is –1.
+
+The default value is –1.
+
+Important:
+If you set Stay Connected to -1 and Job Per Connection to False, then the adapter may not detect disconnections caused by network occurrences. Specifically, the following situation may arise:
+
+The adapter accepts an incoming connection from a remote system.
+
+Recall that when Job Per Connection is set to False, the listener job on the adapter handles each incoming connection rather than spawning new jobs to do so.
+
+A network occurrence causes a disconnection, and the adapter does not receive a TCP FIN or RST packet to terminate the connection.
+
+For example, a firewall between the remote system and adapter may close the connection after a certain amount of time.
+
+The remote system attempts to reestablish the connection, but cannot connect to the listening socket on the adapter.
+
+The remote system generates errors and continuously attempts to reestablish the connection.
+
+To remedy the situation, you must stop and then restart the business service that uses the adapter.
+
+To prevent the situation, set Stay Connected to a value other than -1. For example, if you set Stay Connected to 300, the adapter disconnects after five minutes. Additionally, if you do not need the adapter to process requests in order, you can set Job Per Connection to True, enabling the adapter to process multiple incoming connection requests at one time.

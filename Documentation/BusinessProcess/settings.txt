@@ -1,0 +1,155 @@
+ettings in All Business Processes
+Provides reference information for settings that are available in most or all business processes. You can configure these settings after you have added a business process to your production.
+Summary
+All business processes have the following settings:
+
+Group	Settings	Notes
+Informational Settings	Comment, Category, Class Name, Description, Business Partner	See these settings for business services
+Basic Settings	Enabled	See this setting for business services
+FIFO Message Grouping	Group Calculation, Group Completion Hosts	See Maintaining First-In First-Out (FIFO) Processing
+Additional Settings	Schedule,	See this setting for business services
+Additional Settings	Pool Size, Reply Code Actions	 
+Alerting Control	Alert Retry Grace Period, Queue Count Alert, Queue Wait Alert	 
+Alerting Control	Alert On Error, Inactivity Timeout	See these settings for business services
+Development and Debugging	Log Trace Events	See this setting for business services
+
+Comment
+An optional text description.
+
+Category
+Common to all business hosts. An optional text label that you can use to visually group business hosts within the production diagram. Category names are case-sensitive and can contain space characters.
+
+The Category drop-down list contains all the categories that are used in the current production. Specify this setting as follows:
+
+To specify one category, either type the category name or select it from the Category drop-down list. If you type a category name and it does not yet exist, InterSystems IRIS creates it.
+
+To specify multiple categories, select the check box for each desired category from the Category drop-down list. Or type a comma-separated list of categories.
+
+To delete a category, remove that category selection from all business hosts that use it. If the Category drop-down list still displays the category, that means that the category is still in use. In this case, filter the display to show only business hosts that use that category. Then for each of the business hosts that you see, edit the Category to remove the category.
+
+Class Name
+Common to all business hosts. The business host class name. This field is read-only.
+
+Description
+Common to all business hosts. Comments that describe the business host class. This field is read-only and displays the first line of the class annotation in the code.
+
+Business Partner
+Common to all business hosts. Specifies an optional business partner applicable to this business host. Select a business host profile, if available.
+
+A business partner profile is information about an organization or application connected to your InterSystems IRIS system. For each business partner, you can provide information such as the partner name, notes, primary and alternative contacts, and contact details. Defining a profile has no effect on the behavior or running of the production. It simply gives you a means to store more information.
+
+For example, suppose your production talks to ABC Hospital and XYZ Hospital. You can enter profiles for both of these along with contact information. When you configure items that communicate with these organizations, you can specify the defined business partner for each business host.
+
+For information on defining these profiles, see Configuring Business Partners.
+
+Enabled
+Common to all business hosts. Enables the business host, so that it processes messages whenever the production runs. You can also double-click a business host in the diagram to toggle between enabling and disabling it.
+
+When the Enabled check box is clear, the business host is still present in the configuration, and its queue continues to accept messages, but none of these messages are processed until the business host is enabled again.
+
+This setting is useful, for example, if there is a communications breakdown on the external side. For example, if an email server goes down, or something similar happens, you can disable the associated business service until throughput is restored.
+
+The Enabled check box is a setting stored in the production class definition. If the production is read-only due to being managed by source control, you cannot change this setting unless you have checked the production out of source control. If the production is in source control, you can manage the item using the Stop, Start, and Restart bu
+
+Alert On Error
+Common to all business hosts. When this setting is set to True, as soon as the business host encounters any type of error condition it automatically triggers an alert. An alert writes a message to the Event Log and can also send notification to a user via email or other mechanism. For details, see Configuring Alerts.
+
+Inactivity Timeout
+Common to all business hosts. A business host has an Inactive status after it has not received any messages within the number of seconds specified by the Inactivity Timeout field. The production Monitor Service periodically reviews the status of business services and business operations within the production, and marks the item as Inactive if it has not done anything within the Inactivity Timeout period.
+
+The default value is 0 (zero). If this setting is 0, the business host will never be marked Inactive, no matter how long it stands idle.
+
+Log Trace Events
+Common to all business hosts. Trace messages are informational text messages that InterSystems IRIS can deliver to the Terminal window (if you select the Foreground check box) and, optionally, to the Event Log. Trace messages are unrelated to Visual Trace, which provides a graphical view of production message objects as they travel through a production.
+
+By default, the Log Trace Events check box is clear. When selected, it enables logging of all trace messages issued by this business host. Logging means that InterSystems IRIS writes the trace messages to the console Terminal window (if your job is running in the foreground) and it also stores copies of these messages in the Event Log.
+
+Pool Size
+
+Alert Retry Grace Period
+Common to business processes and operations. Specifies an optional grace period during which errors relating to external connections do not trigger alerts (even if Alert On Error is True).
+
+This grace period starts only after the first occurrence of an error.
+
+If the error condition still exists after the alert period expires, the business operation triggers an alert; otherwise no alert is triggered.
+
+Note that depending on how long it takes the adapter or business operation to return errors, the business host may avoid triggering an alert even when the Failure Timeout expires. For instance, suppose the Retry Interval is 5 seconds, Failure Timeout is 15 seconds, and Alert Retry Grace Period is 14 seconds. If it takes the adapter or business operation more than 1 second to return the error, then the Alert Retry Grace Period goes beyond the Failure Timeout and the alert may not be triggered, depending on how long the adapter/operation takes to return after retrying.
+
+Business services have a similar setting.
+
+Pool Size
+Common to all business hosts. Specifies how many system jobs to allocate to run this business host.
+
+Notes specific to business processes:
+
+A business process shows no pool size if its private pool size is 0 (zero), meaning that it gets its jobs from the public actor pool shared by all business processes in the production.
+
+Larger numbers are not necessarily helpful; see Pool Size and Actor Pool Size.
+
+Important:
+When you disable a business process, it must have a Pool Size = 1 or greater if you want all instances of only this business process to stop. If the business process has a Pool Size = 0, the action disables all business processes that share the actor pool. See Pool Size and Actor Pool Size.
+
+Queue Count Alert
+Common to business processes and operations. Specifies an alert threshold for the number of items in the queue of this business host. An alert is triggered when this threshold is exceeded.
+
+InterSystems IRIS sends an alert when the number of items in a business host’s queue reaches the threshold set by this setting for that business host. This alert has the prefix QueueCountAlert: (not localized). This alert is to detect large queues that are building up.
+
+The service that checks the queue count runs every five seconds, so the granularity of the checking is somewhat limited, but should still provide timely warnings about processing and flow problems.
+
+To disable this alert, specify this setting as 0.
+
+For information on alerts, see Configuring Alerts.
+
+Queue Wait Alert
+Common to business processes and operations. Specifies the length of time that a message can wait in the business host’s queue or be the active message before an alert is triggered.
+
+This alert has the prefix QueueWaitAlert: (not localized). This alert is useful to detect whether a queue is processing messages.
+
+To disable this alert, specify this setting as 0.
+
+The service that checks the wait periods runs every five seconds, so the granularity of the checking is somewhat limited, but should still provide timely warnings about processing and flow problems.
+
+If a Queue Wait alert has been triggered, then the clearing of the known delay happens when the queue delay time for the item at the head of the queue is less than 80% of the Queue Wait Alert time setting. This is to prevent false re-alerting as a queue is drained. It is possible to change the default 80% with the API: Do ##class(Ens.MonitorService).setQWTPct(0.9)
+
+For information on alerts, see Configuring Alerts.
+
+Reply Code Actions
+Common to business processes and business operations. Specifies one or more rules that specify what the business host should do on receipt of various reply status conditions, particularly error conditions. Specify a comma-separated list of code-action pairs.
+
+Important:
+Independent of the value of this setting, the adapter automatically retries in the case of errors such as timeout or failure to connect.
+
+The format of the list is:
+
+code=actions,(code,code)=actions, ... code=action
+
+The following table lists the types of reply status condition identified by code.
+
+Code	Meaning
+E	Error status returned from message handler.
+E#statuscode	Error status returned from message handler has status code equal to statuscode.
+E*text	Error status returned from message handler contains text string text.
+X	There is no reply message object at all.
+The following values for action may be used alone or combined to form strings.
+
+Action	Meaning
+C	Treat the document as Completed OK.
+W	Log a warning but treat the document as Completed OK.
+R	Retry the message according to the configured Retry Interval and Failure Timeout settings; finally Fail, unless a different action is also specified. Note that the final status of the message is Completed. (This means that if you need the final status of the message to indicate an error, you should combine this action code with the F action code.)
+S	Suspend the message, log an error, and move on to try the next message.
+D	Disable the business process or operation, log an error, and restore the outbound message to the front of the business host queue.
+When you choose the disable action for a business process, you must configure the business with a Pool Size = 1 or greater if you want all instances of only this business process to stop. If the business process has a Pool Size = 0, the disable action disables all business processes that share the actor pool. See Pool Size and Actor Pool Size.
+
+F	Fail or retry, depending on the Retry property of the business host (which is not exposed as a setting, but which may be set programmatically):
+If the Retry property is 0, the F option means that the business host will fail the message with an error and then move on to the next message in its queue.
+
+If the Retry property is 1, the F option means that the business host will retry the message, subject to the configured RetryInterval and FailureTimeout settings; if the retry fails, the business host will fail the message with an error and then move on to the next message in its queue.
+
+For example:
+
+E#6301=R,E*ErrGeneral=R,E=F
+
+
+The default value for the Reply Code Actions string is E=F
+
+All codes where the actions consists of only W (log a Warning) are evaluated and warnings generated if they trigger. Other codes are evaluated in left-to-right order, executing the first one that triggers that has a non-warning actions value. For example if the reply code action has the value E=RD, the business process or operation first retries to send the message until Failure Timeout setting and then, if the failure continues, it disables the business process or operation.

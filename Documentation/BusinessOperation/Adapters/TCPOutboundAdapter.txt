@@ -1,0 +1,93 @@
+Settings for the TCP Outbound Adapters
+Provides reference information for settings of the TCP outbound adapters. You can configure these settings after you have added a business operation that uses one of these adapters to your production.
+Summary
+The outbound TCP adapters have the following settings:
+
+Group	Settings
+Basic Settings	IP Address, Port
+Connection Settings	Stay Connected, Connect Timeout, Reconnect Retry, Get Reply, Response Timeout, Read Timeout, SSL Configuration, Local Interface, Charset, Endian
+Additional Settings	Charset
+The remaining settings are common to all business operations. For information, see Settings for All Business Operations.
+
+Charset
+Applies to EnsLib.TCP.CountedOutboundAdapterOpens in a new tab, EnsLib.TCP.CountedXMLOutboundAdapterOpens in a new tab, and EnsLib.TCP.TextLineOutboundAdapterOpens in a new tab.
+
+Specifies the desired character set of the outbound data. InterSystems IRIS® automatically translates the characters to this character encoding. See Charset.
+
+Connect Timeout
+Applies to all outbound TCP adapters.
+
+Number of seconds to wait on each attempt to connect to the remote TCP listener. The default is 5 seconds.
+
+Endian
+Applies to EnsLib.TCP.CountedOutboundAdapterOpens in a new tab and EnsLib.TCP.CountedXMLOutboundAdapterOpens in a new tab.
+
+A choice of Big or Little indicates the byte order of the 4-byte block count prefix. Big endian means the most significant byte (MSB) goes over the wire first; Little endian means the least significant byte (LSB) goes over the wire first. The default value for this string is Big.
+
+Get Reply
+Applies to all outbound TCP adapters.
+
+If 1 (true) wait to read a reply message back from the socket before returning. If 0 (false) do not wait. The default value is 1.
+
+IP Address
+Applies to all outbound TCP adapters.
+
+IP address to make a TCP connection to. The adapter accepts an IPV4 address, an IPV6 address, or a server name that the domain host controller can resolve.
+
+If the string starts with an exclamation point (!) character, the outbound adapter does not initiate the connection but rather waits for an incoming connection request. Once it accepts the connection request, it can send outbound messages. The exclamation point can be specified by itself or followed by a comma-separated list of IP addresses. If the exclamation point is not followed by an IP address, the outbound TCP adapter accepts a connection from any IP address, otherwise the adapter accepts connections only from the specified addresses. The adapter accepts IPV4 addresses, IPV6 addresses, or server names that the domain host controller can resolve. You can optionally specify a port for each IP address by appending a colon (:) followed by the port number. If a port is specified, the adapter accepts connections from only the specified port.
+
+Note:
+IP address filtering is a means to control access on private networks, rather than for publicly accessible systems. InterSystems does not recommend relying on IP address filtering as a sole security mechanism, as it is possible for attackers to spoof IP addresses.
+
+LocalInterface
+Applies to all outbound TCP adapters.
+
+Specifies the network interface through which the TCP connection should go. Select a value from the list or type a value. An empty value means use any interface. For details, see Local Interface.
+
+Port
+Applies to all outbound TCP adapters.
+
+Identifies the TCP port to connect to.
+
+QSize
+Applies to EnsLib.TCP.CountedOutboundAdapterOpens in a new tab, EnsLib.TCP.CountedXMLOutboundAdapterOpens in a new tab, and EnsLib.TCP.TextLineOutboundAdapterOpens in a new tab.
+
+Specifies the number of incoming connections the operating system should hold in reserve on behalf of this business operation. There is generally no reason to change the default value of 0. Either the connection is outbound, or the business operation is using '!' inbound mode, in which case only 1 client is allowed at a time, per business operation pool job.
+
+Read Timeout
+Applies to all TCP adapters.
+
+Number of seconds to wait for each successive incoming TCP read operation, following receipt of initial data from the remote TCP port. The default is 5 seconds. The range is 0–600 seconds (a maximum of 10 minutes).
+
+Reconnect Retry
+Applies to all outbound TCP adapters.
+
+Number of times the adapter attempts to send a message before dropping the connection and reconnecting. A value of 0 (zero) means that the adapter attempts to send the message forever without disconnecting. The default value is 5.
+
+Response Timeout
+Applies to all outbound TCP adapters.
+
+Number of seconds to wait for a response to begin arriving back from the remote system after sending a request. The default is 15 seconds.
+
+SSL Configuration
+Applies to all TCP adapters.
+
+The name of an existing TLS configuration to use to authenticate this connection. Choose a client TLS configuration, because the adapter initiates the communication. For details, see SSL Config.
+
+Stay Connected
+Applies to all TCP adapters.
+
+Specifies how long the TCP adapter stays connected to the remote system after completing an operation and determines how the adapter handles disconnections.
+
+You can specify any of the following values:
+
+A positive value—The adapter remains connected to the remote system for this number of seconds. Disconnections are not handled like errors.
+
+0—The adapter disconnects immediately. Disconnections are not handled like errors.
+
+–1—The adapter is permanently connected, including during idle times.
+
+Note:
+Adapters auto-connect at startup only if the Stay Connected value is –1. Disconnections are handled like errors.
+
+The default value is –1.

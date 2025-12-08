@@ -1,0 +1,67 @@
+Adding a Business Service
+To add a business service to a production:
+
+Add a business host, choosing the Inbound Host option.
+
+For Inbound Type option, choose one of the following:
+
+General—Use this to create a business service other than the following types.
+
+HL7—Use this to create a business service for working with HL7 messages.
+
+X12—Use this to create a business service for working with X12 messages.
+
+Business Metric—Use this to create a business service for working with business metrics.
+
+Then choose one of the following:
+
+(General) Inbound Class—Choose an existing class.
+
+(HL7) Input Type—Choose TCP, File, FTP, HTTP, or SOAP, depending on the form of input data.
+
+(X12) Input Type—Choose TCP, File, FTP, or SOAP, depending on the form of input data.
+
+Name—Specify a name; see Configuration Names.
+
+Configuration Names
+"By default, the name of a configuration item is the name of its underlying host class. However, you can assign a different name, to describe the purpose of the item, for example.
+
+For example, if you have a business service class that communicates with a specific type of server, and you use it to communicate with the same type of server in different enterprise locations, you must configure the business service with different settings to communicate with each enterprise location, even though the type of server is the same. Each different configuration of the business service must have a different name.
+
+The following rules govern configuration names:
+
+The name must consist of at least one character.
+
+The name can contain letters, numbers, and any printable character except for the following:
+
+| ; , : [ < > \ / & "
+
+Neither the first nor the last character can be any of the following: ! $ .
+
+The first character cannot be _
+
+The name (if is it one character long) cannot be *"
+
+(HL7 and X12) Specify values for settings as provided in these reference sections:
+
+Settings for the TCP Inbound Adapter
+
+Settings for the File Inbound Adapter
+
+Settings for the FTP Inbound Adapter
+
+Settings for the HTTP Inbound Adapter
+
+Settings for the SOAP Inbound Adapter
+
+(Business Metric) Metric Class—Select the business metric class to use.
+
+(Business Metric) Call Interval—Specify how often the business metric will recalculate the values of its properties. The Call Interval is in seconds, starting from a minimum of 0.1 seconds. The default is 5 seconds.
+
+Display Category—Specify a category name for use in sorting and organizing items within the production. Category names are case-sensitive, and space characters are allowed. To place an item in multiple categories, list them in the Display Category field separated by commas (with no spaces around these commas).
+
+Comment—Specify an optional text description.
+
+Enable Now—Optionally select this to immediately enable the item.
+
+Click Create.

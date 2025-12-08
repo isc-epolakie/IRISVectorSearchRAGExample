@@ -1,0 +1,334 @@
+Settings for the FTP Inbound Adapter
+Provides reference information for settings of the FTP inbound adapter, EnsLib.FTP.InboundAdapterOpens in a new tab. You can configure these settings after you have added a business service that uses this adapter to your production.
+Summary
+The inbound FTP adapter has the following settings:
+
+Group	Settings
+Basic Settings	External Registry ID, File Path, Delete From Server, Check Modified Before Delete, File Spec Delimiter, File Spec, Archive Path, Call Interval, FTP Server, FTP Port, Credentials
+Connection Settings	Protocol, SSL Configuration, SSL Check Server Identity, SSL Use Session Resumption, UsePASV, Stay Connected, Connect Timeout
+FTP Settings	MLSD, FTP File Order, FTP Ascending, Command Translate Table
+SFTP Settings	SFTP File Order, SFTP Ascending, SFTP Authentication Methods, SFTP Public Key File, SFTP Private Key File, SFTP Passphrase Credentials, SFTP Interactive DTL, SFTP Server Character Set, SFTP Local Character Set
+Additional Settings	Use FileStream, Server List Style, Retryable Errors, Rename Filename, Subdirectory Levels, Charset, Append Timestamp, Confirm Complete, File Access Timeout, Semaphore Specification
+The remaining settings are common to all business services. For information, see Settings for All Business Services.
+
+Append Timestamp
+Append a time stamp to filenames in the Archive Path and Work Path directories; this is useful to prevent possible name collisions on repeated processing of the same filename.
+
+If this value is empty or 0, no time stamp is appended.
+
+If this setting is 1, then the standard template '%f_%Q' is appended.
+
+For other possible values, see Time Stamp Specifications for Filenames.
+
+Archive Path
+Full path name of the directory on the InterSystems IRIS® server to save a copy of each file received from the FTP server. This directory must exist, and it must be accessible through the file system on the local InterSystems IRIS machine.
+
+If not specified, InterSystems IRIS stores the local copy of the file in a temporary location and then deletes it after processing is completed.
+
+Note:
+When you purge message bodies from the system, any files in the Archive Path that are referenced by message bodies are deleted. For more information, see Purging Production Data.
+
+Call Interval
+The polling interval for the adapter, in seconds. This is the time interval at which the adapter checks for input files in the specified locations.
+
+Upon polling, if the adapter finds a file, it links the file to a stream object and passes the stream object to the associated business service. If several files are detected at once, the adapter sends one request to the business service for each individual file until no more files are found.
+
+If the business service processes each file synchronously, the files will be processed sequentially. If the business service sends them asynchronously to a business process or business operation, the files might be processed simultaneously.
+
+After processing all the available files, the adapter waits for the polling interval to elapse before checking for files again. This cycle continues whenever the production is running and the business service is enabled and scheduled to be active.
+
+It is possible to implement a callback in the business service so that the adapter delays for the duration of the CallInterval between inputs. For details, see Defining Business Services.
+
+The default CallInterval is 5 seconds. The minimum is 0.1 seconds.
+
+Charset
+Specifies the character set of the input file. InterSystems IRIS automatically translates the characters from this character encoding. The setting value is not case-sensitive. Use Binary for binary files, or for any data in which newline and line feed characters are distinct or must remain unchanged, for example in HL7 Version 2 or EDI messages. Other settings may be useful when transferring text documents. Choices include:
+
+Binary—Binary transfer (the default for the FTP adapters)
+
+Ascii—Ascii mode FTP transfer but no character encoding translation
+
+Default—The default character encoding of the local InterSystems IRIS server
+
+Latin1—The ISO Latin1 8-bit encoding
+
+ISO-8859-1—The ISO Latin1 8-bit encoding
+
+UTF-8—The Unicode 8-bit encoding
+
+UCS2—The Unicode 16-bit encoding
+
+UCS2-BE—The Unicode 16-bit encoding (Big-Endian)
+
+Any other alias from an international character encoding standard for which NLS (National Language Support) is installed in InterSystems IRIS
+
+@TranslationTable, where TranslationTable is the name of a translation table (in this case InterSystems IRIS uses the given translation table)
+
+For information on character sets and translation tables, see Translation Tables.
+
+Check Modified Before Delete
+When Delete From Server is enabled and Confirm Complete is Size, this optional flag influences checking whether a file has been modified since initial listing for download and then processing.
+
+The size check captures the latest current modified date time during the download of a file. (Note that the precision on a file modified time is limited to minutes.) The date time is used in combination with the file size to determine whether a file has changed on the FTP server since download, that is, whether the file should be deleted, and should be processed as new content. In the case of large files that are synchronously processed (Archive Path is empty), significant time may elapse between the download and attempt to delete the file. Additionally the delete action on the FTP server could be deferred due to network interruption. This setting can be one of the following:
+
+No—Never check whether the file has been modified. Just attempt to delete it.
+
+Deferred—If the deletion is deferred, then check the modified value (Default).
+
+Yes—Always check whether the file has been modified before attempting to delete it.
+
+Note:
+If there are limitations in the FTP server view, where the file modified date is unreliable, then this option should not be enabled, to avoid reprocessing content.
+
+Fatal Errors
+For record map services, determines whether the system stops processing a message when it encounters an error such as a validation error in an individual record. When configuring the adapter, choose one of the following options:
+
+Any—This is the default. If InterSystems IRIS encounters an error when saving an individual record, it stops processing the message.
+
+ParseOnly—If InterSystems IRIS encounters an error when saving an individual record, it logs the error, skips the record, and then continues parsing the message. The log includes the position in the stream of the invalid record. Additionally, if Alert On Error is enabled, the system generates an alert.
+
+Header Count
+For record map services, determines the number of lines that the service ignores as prefix lines in incoming documents. Ignoring prefix lines enables the services to parse reports and comma-separated values (CSV) files with column headers.
+
+Confirm Complete
+Confirm complete receipt of each file, if possible. This setting handles the case where the file is not completely available on the server at the time downloading begins. When configuring the adapter, choose one of the following options:
+
+None—May provide fastest performance for small files because no extra FTP directory listing request needs to be done for each file download attempt
+
+Size—This is the default. Size means keep reading more data for a file until the size reported for it in the server directory listing does not increase. This option is only reliable when the Charset is Binary, because in text mode, the file position used for downloading may become corrupted by the insertion or removal of line feed characters.
+
+Rename—Keep trying to read more data for a file until the server allows us to rename it. This option only works if the FTP server grants the rename privilege to InterSystems IRIS for the download directory, using the Credentials configured on this adapter, and if the file permissions on the file itself are set so that the FTP server has privilege to rename it. If not then the Rename attempt always fails, and the download never completes.
+
+Size & Rename—The Size option alone may not be sufficient when the FTP servers or source application is sluggish. If the server reports the same size for the file twice, sequentially, 2 seconds apart, InterSystems IRIS considers the download complete. Therefore, the Size & Rename setting is preferable if the server supports rename.
+
+If you are working with the ConfirmComplete property programmatically, each option has an integer value from 0 (None) to 3 (Size & Rename). The default is Size (integer value 1).
+
+Command Translate Table
+Specifies the translate table to use for the command channel, specifically for the filename/pathnames. Normally this should not be specified in which case if the FTP server supports UTF8 then the adapter uses it for the filename/pathnames, if the server does not support UTF8 then the adapter uses RAW mode and just reads the bytes as sent. It is possible for a server to provide the filename list in RAW and for it to support UTF8. In this case it might be necessary to set the Command Translate Table to RAW to override the detected UTF8. The values shown in the list are the internal table names.
+
+Connect Timeout
+Number of seconds to wait on each attempt to connect to the FTP server. The default is 5 seconds.
+
+Credentials
+Identifies a production credentials entry that can authorize a connection to the FTP server. See Defining Production Credentials.
+
+Delete From Server
+True or False. If True, delete files from the FTP server after successful processing. If False, the adapter ignores files already processed until something else deletes them from the FTP server. The default is True.
+
+Note:
+When the business host, production, or instance is restarted, any previously processed files will be processed again.
+
+External Registry ID
+ID of External Service Registry entry. Leave blank if you are not using the external registry. The registry endpoint sets the FTPServer, FTPPort, FilePath, and SSLConfig properties. For more information, see Configuring ESB Services and Operations.
+
+File Access Timeout
+Amount of time in seconds that the system waits for information from the source application before confirming the complete receipt of a file. For more information, see Confirm Complete.
+
+If you supply a decimal value, the system rounds the value up to the nearest whole number. The default value is 2.
+
+File Path
+Full pathname of the directory on the FTP server in which to look for files. This directory must exist, and it must be accessible using the Credentials provided. If SubdirectoryLevel is greater than 0, this setting cannot be blank and must specify the top-level directory where the search begins.
+
+File Spec
+Required. Filenames or wildcard file specifications for file(s) to retrieve from the FTP Filename or wildcard file specification for file(s) to retrieve from the FTP server. The format for the FileSpec depends on the protocol being used.
+
+If FTP is selected in the Protocol dropdown setting:
+
+The FileSpec format depends on if the MLSD setting is checked or unchecked. It is left unchecked by default because not all FTP servers support the MLSD command.
+
+If MLSD is unchecked, the FileSpec will be interpreted as shell globs, meaning that the specific format that can be passed in depends on the operating system of the FTP server being used.
+
+See the Wikipedia articleOpens in a new tab for more information on shell glob syntax.
+
+If MLSD is checked, regex will be used instead. Take note that MLSD can pick up hidden files if they match the FileSpec. This may cause unintended behavior, such as processing metadata files put into a directory by the operating system. Be sure to consider this when writing your FileSpec.
+
+If SFTP is selected in the Protocol dropdown setting, the format depends on whether or not the Use Regex box in the SFTP settings section is checked.
+
+If Use Regex is selected, regex will be used to match filenames to determine which to process.
+
+If Use Regex is not selected, a more limited version of shell globs will be used. This format can recognize * as a wildcard for zero or more characters and ? as a wildcard for exactly one character, but it cannot recognize any more complex patterns.
+
+Multiple file specifications can be entered separated by a delimiter. It is necessary to enter the delimiter used in the File Specification Delimiter setting. Enter the FileSpec as one line. Maximum length is 2000 characters.
+
+File Spec Delimiter
+If this is nonempty then it will be used as the delimiter to split the File Specification setting into multiple filename/wild card searches.
+
+FTP Ascending
+Leaving this box checked will cause files to be processed in ascending order, if retrieving from an FTP server. Unchecking it will cause files to be processed in descending order. This setting takes effect only if FTP File Order is specified.
+
+FTP File Order
+Specifies the order in which files are processed if multiple files are found at once, if retrieving from an FTP server. This is blank by default, which means that files will be processed in the order provided by the FTP server, which is typically the same as the Filename option. If this setting is not specified, the FTP Ascending setting is also not used.
+
+FTP Port
+Identifies the TCP port on the FTP server to connect to. The default value is 21.
+
+FTP Server
+Identifies the FTP server to connect to. This can be the IP address or server name, as long as the domain host controller can resolve the name.
+
+MLSD
+Specifies we use MLSD for getting the FTP directory. Required in order to use FTP File Order setting. Not supported by all servers.
+
+Using this setting changes the File Spec format to Regex. Be careful to write a regex File Spec that will not allow for ReDoS attacks, and remember that hidden files can be picked up if they meet the regex File Spec. Such files can appear at unexpected times and a File Spec that includes them may lead to unintended behavior such as sending a malformed file, which can cause errors.
+
+Protocol
+Indicates whether to use FTP (File Transfer Protocol) or SFTP (SSH File Transfer Protocol). If the protocol is FTP, it is possible to use the SSL Configuration setting to configure FTP over TLS. If the protocol is SFTP, then:
+
+UsePASV and ServerListStyle settings are ignored.
+
+FTP Port setting should ordinarily be set to 22.
+
+You must supply a value for the Credentials setting.
+
+If you supply values for the SFTPPublicKeyFile and SFTPPrivateKeyFile settings, the adapter attempts key pair authentication. It does this in conjunction with the username and password supplied via the Credentials setting, using the password in the Credentials as the passphrase for the private key. If you do not use the KeyFile settings, the adapter attempts only username/password authentication based on the Credentials setting.
+
+This setting specifies whether to use FTP or SFTP. If it is left blank, then FTP is used, unless the SSL Configuration setting is !SFTP. In this case, SFTP is used irrespective of the Protocol setting.
+
+Rename Filename
+Specifies name of file to rename the document(s) to after processing. May include timestamp specifiers. The %f specifier if present will be replaced with the name of the document's original source filename (stripped of characters illegal in target filenames).
+
+See the method FormatDateTime() in Ens.Util.Time for documentation of timestamp options. In order to use this functionality, Delete From Server must be unchecked.
+
+Retryable Errors
+Comma-separated list of error types that should be ignored and that should not cause a file to be skipped in the future. Example: ErrGeneral,AnotherError.
+
+Semaphore Specification
+The Semaphore Specification allows you to indicate that the data file or files are complete and ready to be read by creating an associated second file in the same directory that is used as a semaphore. The inbound file adapter waits until the semaphore file exists before checking the other conditions specified by the Confirm Complete requirements and then processing the data file or files. The adapter tests only for the existence of the semaphore file and does not read the semaphore file contents.
+
+If the Semaphore Specification is an empty string, the adapter does not wait for a semaphore file and processes the data files as soon as the conditions specified by the Confirm Complete requirements are met.
+
+If you are using the Semaphore Specification feature, consider setting the Confirm Complete field to None.
+
+Syntax
+Semaphore Specification can be an empty string or can be a series of pairs, each of which associates a data filename specification with a semaphore filename pattern. The pairs are separated by semicolons:
+
+DataFileSpec=SemaphorePattern;DataFileSpec=SemaphorePattern;...
+
+DataFileSpec is either a plain filename or a filename specification that includes the * wildcard (which matches any character). SemaphorePattern directly or indirectly specifies the name of the associated semaphore file; it can be either of the following:
+
+A plain filename (such as SemaphoreFile.SEM). In this case, when the system finds a file that matches DataFileSpec, the system looks for a file with that exact name.
+
+A string of the form *.extension such as *.sem. In this case, when the system finds a file that matches DataFileSpec, the system looks for a file with the same name, but with the sem extension instead. For example, if the filename ABCDEF.txt matches DataFileSpec, the system looks for a semaphore file named ABCDEF.sem
+
+When looking for a semaphore file based on a data filename, the system looks only at the part of the data filename before the first period. For example, if the filename test.txt.data.zip.tar matches DataFileSpec, if the semaphore filename pattern is *.sem the system looks for a semaphore file named test.sem
+
+Notes:
+
+The semaphore file associated with a given data file (or multiple data files) must be in the same directory as those files.
+
+DataFileSpec and SemaphorePattern do not include the directory name.
+
+DataFileSpec is always case-sensitive.
+
+SemaphorePattern is case-sensitive if the operating system is case-sensitive and is not case-sensitive otherwise.
+
+The pairs are processed left-to-right, and the first matching pair is used; see How the Inbound File Adapter Uses Semaphore Specification.
+
+Consequently, if you are including multiple specifications that can match the same file, you should specify the more specific specification before the more general ones.
+
+If an adapter configured with a FileSpec equal to *, the adapter usually considers all files in the directory as data files. But if Semaphore Specification is also specified, the adapter can recognize a file as a semaphore file and not treat it as a data file.
+
+For example, consider the following Semaphore Specification, consisting of a single pair:
+
+ABC*.TXT=ABC*.SEM
+
+In this case, the ABCTest.SEM semaphore file controls when the adapter processes the ABCTest.TXT file and that the ABCdata.SEM semaphore file controls when the adapter processes the ABCdata.txt file.
+
+In the simplest case, Semaphore Specification can consist only of a single SemaphoreFileSpec, which may or may not include a wildcard. This means that the presence or absence of that semaphore file controls whether the adapter processes any files.
+
+Files That Do Not Match a Pattern
+If a Semaphore Specification is specified and a given data file does not match any of the patterns, then the adapter will not process this data file. If this is undesirable, specify a final pair that will match any file and that uses its own semaphore file. For example, consider this Semaphore Specification:
+
+*.DAT=*.SEM; *.DOC=*.READY; *=SEM.LAST
+
+The SEM.LAST is the semaphore file for all files that do not end with .DAT or .DOC.
+
+How the Inbound File Adapter Uses Semaphore Specification
+Within each polling cycle, the inbound file adapter examines all the files found within the configured directory (and any subdirectories). Then for each file:
+
+The adapter reads the Semaphore Specification from left-to-right, finding the first specification whose DataFileSpec matches the given filename. This indicates the name of the semaphore file to look for.
+
+The adapter looks for the semaphore file in the same directory as the file being examined.
+
+Then:
+
+If it does not find the semaphore file, the adapter skips the file and sets an internal flag that causes the adapter to wait until the next polling cycle.
+
+If it does find the semaphore file, the adapter processes the file.
+
+After the adapter has processed through all the data files in a polling cycle, it deletes all the corresponding semaphore files.
+
+SFTP Ascending
+Leaving this box checked will cause files to be processed in ascending order, if retrieving from an SFTP server. Unchecking it will cause files to be processed in descending order. This setting takes effect only if SFTP File Order is specified.
+
+SFTP Authentication Methods
+AuthenticationMethods supported:
+
+Empty—use public/private key if defined, otherwise use username and password from Credentials.
+
+p—use username and password from Credentials.
+
+k—use public/private key.
+
+i—use Interactive (Challenge/Response).
+
+If you specify multiple flags combine in the order required. For example kp leads to public/private key authentication first followed by username and password.
+
+SFTP File Order
+Specifies the order in which files are processed if multiple files are found at once, if retrieving from an SFTP server. This is blank by default, which means that files will be processed in the order provided by the SFTP server, which is typically the same as the Filename option. If this setting is not specified, the SFTP Ascending setting is also not used.
+
+SFTP Interactive DTL
+If specified, this is the DTL to used to handle the Interactive Authentication—also known as the keyboard-interactive or Challenge/Response authentication. This can be a DTL to create an array of answers for the challenge response authentication. See Ens.SSH.InteractiveAuth.DTLOpens in a new tab for more information. Leave blank to return just Credentials password.
+
+SFTP Passphrase Credentials
+This can be used to specify different credentials entry from which the password will be used as the Key authentication Passphrase. If this is blank, the Credentials setting will be used. If this is not blank, then for the Key authentication Passphrase, the system will use the username and password from the given entry.
+
+This separate setting allows having both Public Key and Password authentication.
+
+See Defining Production Credentials.
+
+SFTP Private Key File
+File path to a file containing the SSH private key. Private keys should be PEM encoded. You need both a private and public key for use with AuthenticateWithKeyPairOpens in a new tab. See OpenSSH and PEM-Encoded Keys.
+
+SFTP Public Key File
+File path to a file containing the SSH public key. Public keys should be in OpenSSH format. You need both a private and public key for use with AuthenticateWithKeyPairOpens in a new tab. See OpenSSH and PEM-Encoded Keys.
+
+SFTP Server Character Set
+Character set used by the remote system to encode filenames. The default value is UTF8. You can set the property to "" (an empty string) to indicate that no character set translation is required for filenames. This setting controls the RemoteCharset property of the %Net.SSH.SessionOpens in a new tab object that represents the relevant SSH session.
+
+SFTP Local Character Set
+Character set used by the local system to encode filenames. The default value for Windows systems is "" (an empty string). The default value for UNIX systems is UTF8. You can set the property to "" (an empty string) to indicate that no character set translation is required for filenames. This setting controls the LocalCharset property of the %Net.SSH.SessionOpens in a new tab object that represents the relevant SSH session.
+
+STFP Key Exchange Algorithm
+Specifies the preferred SSH Key Exchange (KEX) algorithm. Available options depend on the host operating system.
+
+Server List Style
+Identifies the operating system on the FTP server. This determines the type of listing format that the FTP server returns. Choose one of the following:
+
+UNIX (the default)
+
+MSDOS
+
+SSL Config
+The name of an existing TLS configuration to use to authenticate this connection. Choose a client TLS configuration, because the adapter initiates the communication.
+
+To create and manage TLS configurations, use the Management Portal. See InterSystems TLS Guide. The first field on the Edit SSL/TLS Configuration page is Configuration Name. Use this string as the value for the SSLConfig setting.
+
+You can use the Protocol setting to use SFTP.
+
+SSL Check Server Identity
+When connecting to an FTP server via TLS, the server name in the certificate must match the DNS name used to connect to the server. This match is based on the rules in section 3.1 of RFC 2818.
+
+SSL Use Session Resumption
+If this setting is enabled, then when making the SSL connection for the data channel, the adapter reuses session parameters from the command channel. This option requires OpenSSL v1.1.x+.
+
+Stay Connected
+A zero value means to disconnect immediately after every input event. The default of –1 means to stay permanently connected, even during idle times. Adapters are assumed idle at startup and therefore only auto-connect if they are configured with a StayConnected value of –1. The only StayConnected values that are useful in the normal case are 0 and –1. However, StayConnected can also be a positive number. If the StayConnected time is longer than the CallInterval, the adapter stays connected all the time. If the StayConnected time is shorter than the CallInterval, the adapter disconnects and reconnects at each CallInterval.
+
+Subdirectory Levels
+Number of levels of subdirectory depth under the given directory that should be searched for files. If the value is greater than 0, the FilePath setting must specify the top-level directory where the search begins.
+
+Use FileStream
+Specifies whether the adapter should use file stream for the data received. If this is false, the adapter uses a global stream. Note that regardless of this setting, a file stream will be used if Archive Path or ArchiveIO is set.
+
+UsePASV
+Use Passive FTP mode: server returns a data port address and the client connects to it. Most firewalls are more tolerant of Passive mode FTP because both the control and data TCP connections are initiated by the client.
