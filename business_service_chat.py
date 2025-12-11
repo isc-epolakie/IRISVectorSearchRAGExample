@@ -17,10 +17,8 @@ Run:
 import os
 import json
 from typing import List, Dict, Any
-
 from openai import OpenAI
-
-from Search import search_embeddings
+from search import search_embeddings
 
 
 # ---------------------------- Configuration ----------------------------
@@ -239,7 +237,6 @@ def chat_loop() -> None:
         structured = extract_answer_and_sources(followup)
 
         print("Agent:\n" + structured["answer"] + "\n")
-
 
 if __name__ == "__main__":
     chat_loop()

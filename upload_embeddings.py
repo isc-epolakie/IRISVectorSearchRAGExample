@@ -1,12 +1,8 @@
-
-# size 1536
-# %%
 import iris  # The InterSystems IRIS Python DB-API driver 
 import pandas as pd
 import numpy as np
 import json
 from pathlib import Path
-
 
 # --- Configuration ---
 PARQUET_FILE_PATH = "your_embeddings.parquet" 
@@ -96,6 +92,5 @@ def upload_embeddings_to_iris(parquet_path: str):
 
 if __name__ == "__main__":
     # Note: Replace 'your_embeddings.parquet' with the actual path to your file.
-    # The script assumes the file exists and the table is set up.
     current_file_path = Path(__file__).resolve()
     upload_embeddings_to_iris(current_file_path.parent / "BusinessService_embedded.parquet")

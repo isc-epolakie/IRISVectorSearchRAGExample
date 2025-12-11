@@ -28,7 +28,7 @@ def search_embeddings(search: str, top_k: int):
     print(f"Searching IRIS vector store for: ", search)
     key = os.getenv("OPENAI_API_KEY")
     client = OpenAI(api_key=key)
- # 2. Establish connection to InterSystems IRIS
+    # 2. Establish connection to InterSystems IRIS
     connection = None
     try:
         conn_string = f"{IRIS_HOST}:{IRIS_PORT}/{IRIS_NAMESPACE}"
@@ -78,6 +78,5 @@ def search_embeddings(search: str, top_k: int):
         return results
 
 if __name__ == "__main__":
-    print("------------")
+    # Example Usage:
     print(search_embeddings("What settings does a business service have?"))
-    print("------------")
